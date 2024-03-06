@@ -32,8 +32,9 @@ Prerequisites for doing the entire process:
         python ./step1_configure.py
         and so on, running each script step from 1 to 4.
         
-The script is only recommended for conversations between 2 people talking, with no music or long sound effects, 
-If there are more people speaking the parameters in `step2_get_transcription.py` can be increased,
-and if there is music in the input a preprocessing step may be needed to remove it first.
+The script is only recommended for conversations between 2 people talking,
+with no music or long sound effects. If there are more people speaking,
+the parameters in `step2_get_transcription.py` can be increased,
+but if there is music in the input, you may need to remove it first.
 ```
 
