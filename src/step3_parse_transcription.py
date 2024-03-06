@@ -31,29 +31,10 @@ def mainAskForInput():
     results = main(audioFile, jsonFile)
     outTextFile = audioFile + '.labels.txt'
     saveToLabels(results, outTextFile)
+
     print('Labels saved to ' + outTextFile)
     print('You can use Audacity (version<=3.0.2) to import this label.txt')
     print('and visually confirm that the audio is being split as expected.')
-
-class Item(object):
-    speaker = None
-    offset = None
-    def __repr__(self):
-      if 'length' in dir(self):
-         return f'<Item speaker={self.speaker} offset={self.offset:.2f} length={self.length:.2f}>'
-      else:
-         return f'<Item speaker={self.speaker} offset={self.offset:.2f}>'
-
-class ItemWithLength(Item):
-    length = None
-    def __repr__(self):
-         return f'<Item speaker={self.speaker} offset={self.offset:.2f} length={self.length:.2f}>'
-
-
-def saveToLabels(results, outTextFile):
-    with open(outTextFile, 'w') as fOut:
-        for item in results:
-            fOut.write(f'{item.offset}\t{item.offset}\tsp{item.speaker}\n')
 
 def main(audioFile, jsonPath):
     prefs = utils.getPrefs()
@@ -66,6 +47,22 @@ def main(audioFile, jsonPath):
         _addLengths(items) # refresh the lengths, since they need to be updated
         
     return items
+
+class Item(object):
+    speaker = None
+    offset = None
+    
+    def __repr__(self):
+      if 'length' in dir(self):
+         return f'<Item speaker={self.speaker} offset={self.offset:.2f} length={self.length:.2f}>'
+      else:
+         return f'<Item speaker={self.speaker} offset={self.offset:.2f}>'
+
+# write to a .labels.txt file that can be imported in Audacity
+def saveToLabels(results, outTextFile):
+    with open(outTextFile, 'w') as fOut:
+        for item in results:
+            fOut.write(f'{item.offset}\t{item.offset}\tsp{item.speaker}\n')
 
 def _goThroughJson(path):
     content = open(path, encoding='utf-8').read()
@@ -137,6 +134,8 @@ def removeWithLengthsUnderThreshold(items):
     return itemsOut
 
 def combineAdjacentWithSameSpeaker(items):
+    # coalesce repeated items with the same speaker down into one.
+    # the lengths will get fixed-up by a later call to addLengths.
     currentSpeaker = None
     itemsOut = []
     for item in items:
@@ -153,10 +152,10 @@ def parseOffset(s):
     alltime = 0
     if 'H' in s:
         num, s = s.split('H')
-        alltime += 60*60*float(num.strip())
+        alltime += 60 * 60 * float(num.strip())
     if 'M' in s:
         num, s = s.split('M')
-        alltime += 60*float(num.strip())
+        alltime += 60 * float(num.strip())
     if 'S' in s:
         num, s = s.split('S')
         alltime += float(num.strip())

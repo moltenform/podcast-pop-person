@@ -9,20 +9,25 @@ import sys
 import json
 
 def getPrefs():
+    if not os.path.exists('.prefs.json'):
+        assertTrue(False, 'no .prefs.json found. wrong current directory, or run step1_configure.py')
+    
+    # represents a simple named-tuple-like pattern, so that we can say
+    # prefs.curl_path instead of prefs['curl_path']
     class Bucket():
         pass
     
-    if not os.path.exists('.prefs.json'):
-        assertTrue(False, 'no .prefs.json found. wrong current directory, or run step1_configure.py')
+    # read prefs file from disk
     with open('.prefs.json', encoding='utf-8') as f:
         s = f.read()
         prefsDict = json.loads(s)
-    
+
     # convert to bucket format, so that we can say
     # prefs.curl_path instead of prefs['curl_path']
     prefsBucket = Bucket()
     for k in prefsDict:
         setattr(prefsBucket, k, prefsDict[k])
+
     return prefsBucket
 
 def run(listArgs, shell=False, createNoWindow=True,

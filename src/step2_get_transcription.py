@@ -19,8 +19,10 @@ def mainAskForInput():
         'https://moltenform.com/pages/podcast-pop-person/podcast-pop-person-demo.flac ' +
         'to help demo the project.')
         
+    print("\n\nNote also that very long (>3 hour) files sometimes run into failures. Most of the time,")
+    print("issue was resolved just by starting the job again from scratch.")
     print("\n\nIf the audio file isn't already online, it needs to be uploaded first, at least to Azure.")
-    audioUrl = input('Please enter an online url for an audio file (must be mono):')
+    audioUrl = input('Please enter an online url for an audio file (should be mono):')
     outName = input('Please enter an output name (default=transcribed.json):')
     outName = outName or 'transcribed.json'
     utils.assertTrue(not os.path.exists(outName), 'Already exists', outName)
@@ -45,7 +47,7 @@ def launchJob(prefs, audioUrl, speakerMin, speakerMax):
     jsonText = r'''{
   "contentUrls": [
     "%audioUrl"
-  ],;
+  ],
   "locale": "%locale",
   "displayName": "%displayName",
   "model": null,
@@ -63,7 +65,7 @@ def launchJob(prefs, audioUrl, speakerMin, speakerMax):
 }    
     '''
     
-    # quirk with the system: the call fails if only en-US is given, so give all three.
+    # quirk with Azure's system: the call fails if only en-US is given, so give all three.
     candidateLocales = '"en-US", "de-DE", "es-ES"'
     
     # fill in the template
@@ -75,6 +77,7 @@ def launchJob(prefs, audioUrl, speakerMin, speakerMax):
     args.append(jsonText)
     args.append(endpoint)
     args.insert(0, prefs.curl_path)
+    print(args)
     
     print('Sending to azure:', endpoint)
     retcode, stdout, stderr = utils.run(args)
@@ -88,7 +91,7 @@ def launchJob(prefs, audioUrl, speakerMin, speakerMax):
     return transcId
     
 
-# Perform get request on Azure
+# Perform get request against Azure
 def _azureHttpGet(prefs, url):
     print('GET request from url: ', url)
     args = (rf'-v|-X|GET|{url}|-H|Ocp-Apim-Subscription-Key: {prefs.sub_key}').split('|')
@@ -141,7 +144,7 @@ def _pollUntilCompleted(prefs, transcriptionId, audioUrl, outPath, sleepTime):
     
 
 # helper provided for your convenience.
-# can also grab an id in case the process crashes and you want to recover the results from an earlier run.
+# can also grab an id in case the process closes and you want to recover the results from an earlier run.
 def showJobStatus(id='all'):
     prefs = utils.getPrefs()
     if id == 'all':

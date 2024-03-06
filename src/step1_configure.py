@@ -11,16 +11,16 @@ def mainAskForInput():
         print('prefs file (.prefs.json) already exists.')
         return
         
-    curl_path = input('Please enter a path for curl. If you are on a linux system, ' + 
+    curl = input('Please enter a path for curl. If you are on a linux system, ' + 
         'just enter curl. If you are on a Windows system, we recommend you ' +
         'use curl from mingw64, Git for Windows, or chocolatey/msys2/scoop:')
-    prefs['curl_path'] = curl_path
+    prefs['curl_path'] = curl
     
-    sub_key = input('Go into Azure and create a Speech Service instance. ' +
+    subkey = input('Go into Azure and create a Speech Service instance. ' +
         'You will need to be on the Standard pricing tier (but can still be in the $200 trial). ' +
         'On the first screen if you scroll down you will see Keys and Endpoint,'
         'Please copy one of the keys and paste it:')
-    prefs['sub_key'] = sub_key
+    prefs['sub_key'] = subkey
     
     region = input('Paste the Azure location/region, such as westus:')
     prefs['region'] = region

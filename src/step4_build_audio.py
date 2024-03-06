@@ -6,8 +6,8 @@ import utils
 import os
 import itertools
 import librosa
+import soundfile
 import numpy as np
-import soundfile as sf
 
 # fade-in and fade-out
 fadeLength = 1.0
@@ -34,7 +34,7 @@ def main(pathMainAudio, pathJson, pathIntro, pathOutro, pathSoundDuringTransitio
     buildAudioWithoutThisSpeaker(pathMainAudio, pathJson, pathIntro, pathOutro, pathSoundDuringTransition, 2, pathMainAudio + '.out.2.flac')
 
 def buildAudioWithoutThisSpeaker(pathMainAudio, pathJson, pathIntro, pathOutro,
-    pathSoundDuringTransition, whichToRemove, pathOutput):
+        pathSoundDuringTransition, whichToRemove, pathOutput):
     import step3_parse_transcription
     itemsAll = step3_parse_transcription.main(pathMainAudio, pathJson)
     items = [item for item in itemsAll if item.speaker != whichToRemove]
@@ -65,28 +65,28 @@ def buildAudioWithoutThisSpeaker(pathMainAudio, pathJson, pathIntro, pathOutro,
             result = np.append(result, soundDuringTransition)
 
     result = np.append(result, outro)
-    sf.write(pathOutput, result, currentSampleRate)
+    soundfile.write(pathOutput, result, currentSampleRate)
     
 
-def getPieceOfAudio(origAud, sr, startTimeRaw, endTimeRaw):
+def getPieceOfAudio(origAud, currentSampleRate, startTimeRaw, endTimeRaw):
     # i chose to use librosa and soundfile for this project,
     # even though they need a few dependencies to install.
     # sox could also be used to put pieces of audio together.
-    st = int(startTimeRaw * sr)
-    end = int(endTimeRaw * sr)
-    return origAud[st:end]
+    start = int(startTimeRaw * currentSampleRate)
+    end = int(endTimeRaw * currentSampleRate)
+    return origAud[start:end]
 
 
-def applyFadeInAndFadeOut(audio, fade_duration, sr):
-   fade_in_samples = int(fade_duration * sr)
-   fade_out_samples = int(fade_duration * sr)
-   fade_in = np.arange(fade_in_samples)
-   fade_in = fade_in / fade_in_samples
-   fade_out = np.arange(fade_out_samples, 0, -1)
-   fade_out = fade_out / fade_out_samples
+def applyFadeInAndFadeOut(audio, fadeDuration, currentSampleRate):
+   fadeInSamples = int(fadeDuration * currentSampleRate)
+   fadeOutSamples = int(fadeDuration * currentSampleRate)
+   fadeIn = np.arange(fadeInSamples)
+   fadeIn = fadeIn / fadeInSamples
+   fadeOut = np.arange(fadeOutSamples, 0, -1)
+   fadeOut = fadeOut / fadeOutSamples
 
-   audio[:fade_in_samples] *= fade_in
-   audio[-fade_out_samples:] *= fade_out
+   audio[:fadeInSamples] *= fadeIn
+   audio[-fadeOutSamples:] *= fadeOut
    return audio
 
 def loadInputAudio(path, currentSampleRate, convertTo44100):

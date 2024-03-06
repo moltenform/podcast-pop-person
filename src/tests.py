@@ -1,4 +1,7 @@
 
+# Ben Fisher, 2024
+# https://github.com/moltenform/podcast-pop-person
+
 import os
 import utils
 import json
@@ -6,6 +9,7 @@ import step2_get_transcription
 import step3_parse_transcription
 from step3_parse_transcription import parseOffset
 
+# test parsing the timestamp format like 'PT2H45M11.48S'
 def testParseOffset():
     def assertClose(expected, got):
         if abs(expected - got) > 0.0001:
@@ -16,6 +20,7 @@ def testParseOffset():
     assertClose(11.48, parseOffset("PT11.48S"))
     print('testParseOffset complete')
 
+# test the algorithm that removes short fragments for debouncing
 testRemoveShortFragmentsData = [[
     '''[<Item speaker=1 offset=10.00 length=60.00>, <Item speaker=2 offset=70.00 length=30.00>, <Item speaker=1 offset=100.00 length=99999.00>]''',
     {"other1": "ab", "speaker": 1, "offset": "PT10S", "other": 123},
@@ -80,12 +85,13 @@ def testRemoveShortFragments():
             expected = test.pop(0)
             with open(tmpResults, 'w') as fOut:
                 fOut.write('aa' + json.dumps(test) + 'aa')
+            
             results = step3_parse_transcription.main(None, tmpResults)
             utils.assertEq(str(expected), str(results))
     finally:
         if os.path.exists(tmpResults):
             os.unlink(tmpResults)
-
+    print('testRemoveShortFragments complete')
 
 def testAll():
     testParseOffset()

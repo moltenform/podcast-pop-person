@@ -30,6 +30,10 @@ Prerequisites for doing the entire process:
         conda activate my_conda_env_with_py310
         cd podcast-pop-person/src
         python ./step1_configure.py
-        and so on, running each script step.
+        and so on, running each script step from 1 to 4.
+        
+The script is only recommended for conversations between 2 people talking, with no music or long sound effects, 
+If there are more people speaking the parameters in `step2_get_transcription.py` can be increased,
+and if there is music in the input a preprocessing step may be needed to remove it first.
 ```
 
