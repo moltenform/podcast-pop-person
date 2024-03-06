@@ -154,6 +154,6 @@ def showJobStatus(id='all'):
     for line in lines:
         print(line)
 
-if __name__=='__main__':
+if __name__ == '__main__':
     mainAskForInput()
 

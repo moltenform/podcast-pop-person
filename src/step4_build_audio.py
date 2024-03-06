@@ -2,24 +2,82 @@
 # Ben Fisher, 2024
 # https://github.com/moltenform/podcast-pop-person
 
+import utils
+import os
+import itertools
+import librosa
+import numpy as np
+import soundfile as sf
+
 # fade-in and fade-out
 fadeLength = 1.0
 
 # we'll support incoming audio in either 44.1k or 48k,
-# and we'll adjust the sound effects without needing to resample the large input audio file.
+# and we'll optimize so that we never resample the large input audio coming in.
 defaultSampleRate = 48000
 
-def main():
-    pathIntro = input('Please enter path to an intro sound (default=intro.flac):')
-    pathIntro = pathIntro or '../intro.flac'
-    pathOutro = input('Please enter path to an outro sound (default=outro.flac):')
-    pathOutro = pathOutro or '../outro.flac'
-    pathGuitar = input('Please enter path to a marker sound played during transitions (default=sound.flac):')
-    pathGuitar = pathGuitar or '../sound.flac'
+def mainAskForInput():
+    print('The script works best with mono files in flac or mp3 format.\n\n')
+    pathMainAudio = input('Please enter path to the podcast episode audio:')
+    pathJson = input('Please enter path to the transcription json file:')
     
+    pathIntro = input('Please enter path to an intro sound (default=intro.flac):')
+    pathIntro = pathIntro or '../sample/intro.flac'
+    pathOutro = input('Please enter path to an outro sound (default=outro.flac):')
+    pathOutro = pathOutro or '../sample/outro.flac'
+    pathSoundDuringTransition = input('Please enter path to a marker sound played during transitions (default=sound.flac):')
+    pathSoundDuringTransition = pathSoundDuringTransition or '../sample/sound.flac'
+    main(pathMainAudio, pathJson, pathIntro, pathOutro, pathSoundDuringTransition)
+
+def main(pathMainAudio, pathJson, pathIntro, pathOutro, pathSoundDuringTransition):
+    buildAudioWithoutThisSpeaker(pathMainAudio, pathJson, pathIntro, pathOutro, pathSoundDuringTransition, 1, pathMainAudio + '.out.1.flac')
+    buildAudioWithoutThisSpeaker(pathMainAudio, pathJson, pathIntro, pathOutro, pathSoundDuringTransition, 2, pathMainAudio + '.out.2.flac')
+
+def buildAudioWithoutThisSpeaker(pathMainAudio, pathJson, pathIntro, pathOutro,
+    pathSoundDuringTransition, whichToRemove, pathOutput):
+    import step3_parse_transcription
+    itemsAll = step3_parse_transcription.main(pathMainAudio, pathJson)
+    items = [item for item in itemsAll if item.speaker != whichToRemove]
+    utils.assertTrue(len(items) > 0)
+    
+    origAudio, sr = librosa.load(pathMainAudio, sr=None)
+    if sr == 48000:
+        currentSampleRate = 48000
+        convertTo44100 = False
+    elif sr == 44100:
+        currentSampleRate = 44100
+        convertTo44100 = True
+    else:
+        utils.assertTrue(False, 'unsupported sample rate', sr)
+    
+    soundDuringTransition = loadInputAudio(pathSoundDuringTransition, currentSampleRate, convertTo44100)
+    intro = loadInputAudio(pathIntro, currentSampleRate, convertTo44100)
+    outro = loadInputAudio(pathOutro, currentSampleRate, convertTo44100)
+    
+    result = intro.copy()
+    for i, item in enumerate(items):
+        isLast = i == len(items ) - 1
+        piece = getPieceOfAudio(origAudio, currentSampleRate, item.offset, item.offset + item.length )
+        applyFadeInAndFadeOut(piece, fadeLength, currentSampleRate)
+        
+        result = np.append(result, piece)
+        if not isLast:
+            result = np.append(result, soundDuringTransition)
+
+    result = np.append(result, outro)
+    sf.write(pathOutput, result, currentSampleRate)
     
 
-def apply_fade_in_out(audio, fade_duration, sr):
+def getPieceOfAudio(origAud, sr, startTimeRaw, endTimeRaw):
+    # i chose to use librosa and soundfile for this project,
+    # even though they need a few dependencies to install.
+    # sox could also be used to put pieces of audio together.
+    st = int(startTimeRaw * sr)
+    end = int(endTimeRaw * sr)
+    return origAud[st:end]
+
+
+def applyFadeInAndFadeOut(audio, fade_duration, sr):
    fade_in_samples = int(fade_duration * sr)
    fade_out_samples = int(fade_duration * sr)
    fade_in = np.arange(fade_in_samples)
@@ -31,17 +89,17 @@ def apply_fade_in_out(audio, fade_duration, sr):
    audio[-fade_out_samples:] *= fade_out
    return audio
 
-def loadInputAudio(path, currentSampleRate, convertTo41):
-    isMono = helper_diagnose_transcription_issue.isItMono(path)
-    if isMono == 'stereo':
-        print('Note, this is stereo, so it will not be as efficient.')
-    
-    if convertTo41:
+def loadInputAudio(path, currentSampleRate, convertTo44100):
+    if convertTo44100:
         utils.assertEq(44100, currentSampleRate)
         audio, sr = librosa.load(path, sr=44100)
         utils.assertEq(currentSampleRate, sr, 'sample rate conversion failed for file ' + path)
     else:
         audio, sr = librosa.load(path, sr=None)
-        utils.assertEq(currentSampleRate, sr, 'unexpected sample rate for file ' + path)
+        utils.assertEq(currentSampleRate, sr, 'unsupported sample rate for file ' + path)
         
     return audio
+
+if __name__ == '__main__':
+    mainAskForInput()
+

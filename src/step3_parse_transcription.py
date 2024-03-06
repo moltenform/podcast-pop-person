@@ -2,6 +2,10 @@
 # Ben Fisher, 2024
 # https://github.com/moltenform/podcast-pop-person
 
+import utils
+import os
+import step4_build_audio
+
 # currently supports Whisper(open source) and Azure speech recognition
 # performs some needed debouncing.
 
@@ -17,9 +21,7 @@ markEndOfAudio = 99999
 # if prioritizeIncomingSpeaker = True it runs right-to-left, we transition to the next speaker more quickly
 prioritizeIncomingSpeaker = True
 
-import utils
-import os
-import step4_build_audio
+# if the fade length is longer than one segment of audio that might sound odd
 assert step4_build_audio.fadeLength * 2 < minLengthInSeconds
 
 
@@ -165,6 +167,4 @@ def parseOffset(s):
 if __name__ == '__main__':
     mainAskForInput()
     
-
-
 

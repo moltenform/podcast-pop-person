@@ -30,6 +30,6 @@ def mainAskForInput():
     
     print('Complete.')
     
-if __name__=='__main__':
+if __name__ == '__main__':
     mainAskForInput()
 
