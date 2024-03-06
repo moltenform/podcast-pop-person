@@ -1,6 +1,11 @@
 # podcast-pop-person
+
 Take a podcast episode and remove one of the speakers!
 
+Uses AI to differentiate between the different speakers, and then replaces one of the speakers with a soft transition sound effect. You can provide an intro sound and an outro sound. To see it in action, run `step4_build_audio.py` and provide `../sample/podcast-pop-person-demo.flac` and `../sample/sample-transcribed.json` as inputs.
+
+
+```
 https://github.com/moltenform/podcast-pop-person
 Ben Fisher, 2024
 GPLv2
@@ -8,6 +13,8 @@ GPLv2
 Prerequisites for doing the entire process:
     Python 3
     An Azure account
+        (The script is also compatible with Whisper which is open source,
+        but the Azure platform had much better diarization results).
     Python libraries librosa, numpy, and soundfile
         Best way to set this up:
         Install anaconda
@@ -24,6 +31,5 @@ Prerequisites for doing the entire process:
         cd podcast-pop-person/src
         python ./step1_configure.py
         and so on, running each script step.
-        
-            
+```
 
