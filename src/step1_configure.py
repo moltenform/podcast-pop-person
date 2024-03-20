@@ -4,6 +4,7 @@
 
 import json
 import os
+import utils
 
 def mainAskForInput():
     prefs = {}
@@ -14,7 +15,7 @@ def mainAskForInput():
     curl = input('Please enter a path for curl. If you are on a linux system, ' + 
         'just enter curl. If you are on a Windows system, we recommend you ' +
         'use curl from mingw64, Git for Windows, or chocolatey/msys2/scoop:')
-    prefs['curl_path'] = curl
+    prefs['curl_path'] = utils.helpInterpretPath(curl)
     
     subkey = input('Go into Azure and create a Speech Service instance. ' +
         'You will need to be on the Standard pricing tier (but can still be in the $200 trial). ' +

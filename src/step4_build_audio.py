@@ -27,6 +27,13 @@ def mainAskForInput():
     pathOutro = pathOutro or '../sample/outro.flac'
     pathSoundDuringTransition = input('Please enter path to a marker sound played during transitions (default=sound.flac):')
     pathSoundDuringTransition = pathSoundDuringTransition or '../sample/sound.flac'
+    
+    pathMainAudio = utils.helpInterpretPath(pathMainAudio)
+    pathJson = utils.helpInterpretPath(pathJson)
+    pathIntro = utils.helpInterpretPath(pathIntro)
+    pathOutro = utils.helpInterpretPath(pathOutro)
+    pathSoundDuringTransition = utils.helpInterpretPath(pathSoundDuringTransition)
+    
     main(pathMainAudio, pathJson, pathIntro, pathOutro, pathSoundDuringTransition)
 
 def main(pathMainAudio, pathJson, pathIntro, pathOutro, pathSoundDuringTransition):

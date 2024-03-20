@@ -68,6 +68,13 @@ def run(listArgs, shell=False, createNoWindow=True,
 
     return retcode, stdout, stderr
 
+def helpInterpretPath(s):
+    s = s.strip()
+    if s.startswith('"') and s.endswith('"'):
+        s = s[1:-1]
+
+    return s
+
 def assertTrue(condition, *messageArgs):
     if not condition:
         msg = ' '.join(map(str, messageArgs)) if messageArgs else ''

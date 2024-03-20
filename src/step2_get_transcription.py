@@ -25,6 +25,7 @@ def mainAskForInput():
     audioUrl = input('Please enter an online url for an audio file (should be mono):')
     outName = input('Please enter an output name (default=transcribed.json):')
     outName = outName or 'transcribed.json'
+    outName = utils.helpInterpretPath(outName)
     utils.assertTrue(not os.path.exists(outName), 'Already exists', outName)
     main(audioUrl, outName)
 
