@@ -126,7 +126,7 @@ def _pollUntilCompleted(prefs, transcriptionId, audioUrl, outPath, sleepTime):
     filesUrl = jsonObj['links']['files']
     jsonObjFiles = _azureHttpGet(prefs, filesUrl)
     alreadyWrote = False
-    for i, item in enumerate(jsonObjFiles['values']):
+    for item in jsonObjFiles['values']:
         if item['kind'] == 'Transcription':
             contentUrl = item['links']['contentUrl']
             theContent = _azureHttpGet(prefs, contentUrl)

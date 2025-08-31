@@ -56,6 +56,7 @@ def buildAudioWithoutThisSpeaker(pathMainAudio, pathJson, pathIntro, pathOutro,
         convertTo44100 = True
     else:
         utils.assertTrue(False, 'unsupported sample rate', sr)
+        return
     
     soundDuringTransition = loadInputAudio(pathSoundDuringTransition, currentSampleRate, convertTo44100)
     intro = loadInputAudio(pathIntro, currentSampleRate, convertTo44100)

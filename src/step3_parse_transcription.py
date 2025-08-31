@@ -37,7 +37,7 @@ def mainAskForInput():
     print('and visually confirm that the audio is being split as expected.')
 
 def main(audioFile, jsonPath):
-    prefs = utils.getPrefs()
+    _prefs = utils.getPrefs()
     items = _goThroughJson(jsonPath)
     items = combineAdjacentWithSameSpeaker(items)
     _addLengths(items)
@@ -48,7 +48,7 @@ def main(audioFile, jsonPath):
         
     return items
 
-class Item(object):
+class Item:
     speaker = None
     offset = None
     
@@ -60,7 +60,7 @@ class Item(object):
 
 # write to a .labels.txt file that can be imported in Audacity
 def saveToLabels(results, outTextFile):
-    with open(outTextFile, 'w') as fOut:
+    with open(outTextFile, 'w', encoding='utf-8') as fOut:
         for item in results:
             fOut.write(f'{item.offset}\t{item.offset}\tsp{item.speaker}\n')
 
@@ -74,7 +74,9 @@ def _goThroughJson(path):
         for part in parts:
             item = Item()
             item.speaker = int(part.split('"')[0]) 
-            if item.speaker == 0: item.speaker = 2
+            if item.speaker == 0:
+                item.speaker = 2
+            
             assert item.speaker == 1 or item.speaker == 2
             item.offset = part.split('"timestamp": [')[1].split(',')[0]
             assert len(item.offset) > 1

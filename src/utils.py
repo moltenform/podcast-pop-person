@@ -7,15 +7,11 @@ import pprint
 import os
 import sys
 import json
+from shinerainsevenlib.standard import *
 
 def getPrefs():
     if not os.path.exists('.prefs.json'):
         assertTrue(False, 'no .prefs.json found. wrong current directory, or run step1_configure.py')
-    
-    # represents a simple named-tuple-like pattern, so that we can say
-    # prefs.curl_path instead of prefs['curl_path']
-    class Bucket():
-        pass
     
     # read prefs file from disk
     with open('.prefs.json', encoding='utf-8') as f:
@@ -64,7 +60,7 @@ def run(listArgs, shell=False, createNoWindow=True,
             str(listArgs) + '\nretcode was ' + str(retcode) + \
             '\nstdout was ' + str(stdout) + \
             '\nstderr was ' + str(stderr)
-        raise throwOnFailure(getPrintable(exceptionText))
+        raise throwOnFailure(srss.getPrintable(exceptionText))
 
     return retcode, stdout, stderr
 
@@ -75,17 +71,4 @@ def helpInterpretPath(s):
 
     return s
 
-def assertTrue(condition, *messageArgs):
-    if not condition:
-        msg = ' '.join(map(str, messageArgs)) if messageArgs else ''
-        raise AssertionError(msg)
-
-def assertEq(expected, received, *messageArgs):
-    if expected != received:
-        msg = ' '.join(map(str, messageArgs)) if messageArgs else ''
-        msg += '\nassertion failed, expected:\n'
-        msg += getPrintable(pprint.pformat(expected))
-        msg += '\nbut got:\n'
-        msg += getPrintable(pprint.pformat(received))
-        raise AssertionError(msg)
 

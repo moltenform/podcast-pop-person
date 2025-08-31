@@ -13,7 +13,7 @@ from step3_parse_transcription import parseOffset
 def testParseOffset():
     def assertClose(expected, got):
         if abs(expected - got) > 0.0001:
-            assert False, f'test failed, expected {expected} but got {got}'
+            raise RuntimeError(f'test failed, expected {expected} but got {got}')
     
     assertClose(2*60*60 + 45*60+11.48, parseOffset("PT2H45M11.48S"))
     assertClose(45*60+11.48, parseOffset("PT45M11.48S"))
@@ -83,7 +83,7 @@ def testRemoveShortFragments():
     try:
         for test in testRemoveShortFragmentsData:
             expected = test.pop(0)
-            with open(tmpResults, 'w') as fOut:
+            with open(tmpResults, 'w', encoding='utf-8') as fOut:
                 fOut.write('aa' + json.dumps(test) + 'aa')
             
             results = step3_parse_transcription.main(None, tmpResults)
@@ -100,4 +100,3 @@ def testAll():
 
 if __name__ == '__main__':
     testAll()
-    
