@@ -13,7 +13,7 @@ def mainPylint():
     print(args)
     retcode, stdout, stderr = files.run(args, throwOnFailure=False)
     if stderr:
-        print('pylint failed', retcode, stdout.decode('utf-8'), stderr.decode('utf-8'))
+        print('pylint failed', stdout.decode('utf-8'), stderr.decode('utf-8'))
         return
 
     stdout = stdout.decode('utf-8')
@@ -45,7 +45,7 @@ def mainRuff():
     print(args)
     retcode, stdout, stderr = files.run(args, throwOnFailure=False)
     if stderr:
-        print('pylint failed', retcode, stdout.decode('utf-8'), stderr.decode('utf-8'))
+        print('ruff failed', stdout.decode('utf-8'), stderr.decode('utf-8'))
         return
 
     stdout = stdout.decode('utf-8')

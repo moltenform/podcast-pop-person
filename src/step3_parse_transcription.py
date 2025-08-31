@@ -36,8 +36,10 @@ def mainAskForInput():
     print('and visually confirm that the audio is being split as expected.')
 
 
-def main(audioFile, jsonPath):
-    _prefs = utils.getPrefs()
+def main(audioFile, jsonPath, isTest=False):
+    if not isTest:
+        _prefs = utils.getPrefs()
+
     items = _goThroughJson(jsonPath)
     items = combineAdjacentWithSameSpeaker(items)
     _addLengths(items)

@@ -259,7 +259,7 @@ def testRemoveShortFragments():
             with open(tmpResults, 'w', encoding='utf-8') as fOut:
                 fOut.write('aa' + json.dumps(test) + 'aa')
 
-            results = step3_parse_transcription.main(None, tmpResults)
+            results = step3_parse_transcription.main(None, tmpResults, isTest=True)
             utils.assertEq(str(expected), str(results))
     finally:
         if os.path.exists(tmpResults):
@@ -270,7 +270,7 @@ def testRemoveShortFragments():
 def testAll():
     testParseOffset()
     testRemoveShortFragments()
-
+    print('all tests complete')
 
 if __name__ == '__main__':
     testAll()
