@@ -1,4 +1,3 @@
-
 # Ben Fisher, 2024
 # https://github.com/moltenform/podcast-pop-person
 
@@ -36,6 +35,7 @@ def mainAskForInput():
     print('You can use Audacity (version<=3.0.2) to import this label.txt')
     print('and visually confirm that the audio is being split as expected.')
 
+
 def main(audioFile, jsonPath):
     _prefs = utils.getPrefs()
     items = _goThroughJson(jsonPath)
@@ -45,24 +45,27 @@ def main(audioFile, jsonPath):
         items = removeWithLengthsUnderThreshold(items)
         items = combineAdjacentWithSameSpeaker(items)
         _addLengths(items) # refresh the lengths, since they need to be updated
-        
+
     return items
+
 
 class Item:
     speaker = None
     offset = None
-    
+
     def __repr__(self):
-      if 'length' in dir(self):
-         return f'<Item speaker={self.speaker} offset={self.offset:.2f} length={self.length:.2f}>'
-      else:
-         return f'<Item speaker={self.speaker} offset={self.offset:.2f}>'
+        if 'length' in dir(self):
+            return f'<Item speaker={self.speaker} offset={self.offset:.2f} length={self.length:.2f}>'
+        else:
+            return f'<Item speaker={self.speaker} offset={self.offset:.2f}>'
+
 
 # write to a .labels.txt file that can be imported in Audacity
 def saveToLabels(results, outTextFile):
     with open(outTextFile, 'w', encoding='utf-8') as fOut:
         for item in results:
             fOut.write(f'{item.offset}\t{item.offset}\tsp{item.speaker}\n')
+
 
 def _goThroughJson(path):
     content = open(path, encoding='utf-8').read()
@@ -73,14 +76,14 @@ def _goThroughJson(path):
         items = []
         for part in parts:
             item = Item()
-            item.speaker = int(part.split('"')[0]) 
+            item.speaker = int(part.split('"')[0])
             if item.speaker == 0:
                 item.speaker = 2
-            
+
             assert item.speaker == 1 or item.speaker == 2
             item.offset = part.split('"timestamp": [')[1].split(',')[0]
             assert len(item.offset) > 1
-            
+
             item.offset = float(item.offset)
             items.append(item)
     else:
@@ -94,27 +97,28 @@ def _goThroughJson(path):
             assert item.speaker == 1 or item.speaker == 2
             item.offset = part.split(', "offset": "')[1].split('"')[0]
             assert len(item.offset) > 1
-            
+
             item.offset = parseOffset(item.offset)
             items.append(item)
-    
+
     # just in case, make sure it is all sorted in order
     items.sort(key=lambda item: item.offset)
     return items
+
 
 def _addLengths(items):
     for i, item in enumerate(items):
         if i == len(items) - 1:
             item.length = markEndOfAudio
         else:
-            item.length = items[i+1].offset - items[i].offset
+            item.length = items[i + 1].offset - items[i].offset
 
 
 def removeWithLengthsUnderThreshold(items):
     # can be either a false-positive, or a short interjection by the other speaker, in both cases it's good to remove it
     itemsOut = []
     skipped = 0
-    
+
     if prioritizeIncomingSpeaker:
         i = len(items) - 1
         while i >= 0:
@@ -123,17 +127,18 @@ def removeWithLengthsUnderThreshold(items):
                 itemsOut[-1].offset = items[i].offset # remember to fix-up the location
             else:
                 itemsOut.append(items[i])
-            i-=1
+            i -= 1
         itemsOut.reverse()
     else:
         for i, item in enumerate(items):
-            if i !=0 and i != len(items) - 1 and item.length < minLengthInSeconds:
+            if i != 0 and i != len(items) - 1 and item.length < minLengthInSeconds:
                 skipped += 1
             else:
                 itemsOut.append(item)
-    
+
     print('Skipped this many segments for being too short:', skipped)
     return itemsOut
+
 
 def combineAdjacentWithSameSpeaker(items):
     # coalesce repeated items with the same speaker down into one.
@@ -144,8 +149,9 @@ def combineAdjacentWithSameSpeaker(items):
         if item.speaker != currentSpeaker:
             itemsOut.append(item)
             currentSpeaker = item.speaker
-            
+
     return itemsOut
+
 
 def parseOffset(s):
     s = s.strip()
@@ -161,11 +167,10 @@ def parseOffset(s):
     if 'S' in s:
         num, s = s.split('S')
         alltime += float(num.strip())
-    
+
     utils.assertTrue(not s)
     return alltime
 
+
 if __name__ == '__main__':
     mainAskForInput()
-    
-

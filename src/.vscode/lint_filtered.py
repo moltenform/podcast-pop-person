@@ -15,7 +15,7 @@ def mainPylint():
     if stderr:
         print('pylint failed', retcode, stdout.decode('utf-8'), stderr.decode('utf-8'))
         return
-    
+
     stdout = stdout.decode('utf-8')
     events = json.loads(stdout)
     events = events['messages']
@@ -47,7 +47,7 @@ def mainRuff():
     if stderr:
         print('pylint failed', retcode, stdout.decode('utf-8'), stderr.decode('utf-8'))
         return
-    
+
     stdout = stdout.decode('utf-8')
     events = json.loads(stdout)
     for event in events:
@@ -70,12 +70,7 @@ def formatOneLinePylint(msg):
 
 
 if __name__ == '__main__':
-    try:
-        files.delete('__init__.py')
-        if '--ruff' in sys.argv:
-            mainRuff()
-        else:
-            mainPylint()
-    finally:
-        files.writeAll('__init__.py', '')
-
+    if '--ruff' in sys.argv:
+        mainRuff()
+    else:
+        mainPylint()

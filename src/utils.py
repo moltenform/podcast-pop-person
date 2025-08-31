@@ -1,4 +1,3 @@
-
 # Ben Fisher, 2024
 # https://github.com/moltenform/podcast-pop-person
 
@@ -9,10 +8,13 @@ import sys
 import json
 from shinerainsevenlib.standard import *
 
+
 def getPrefs():
     if not os.path.exists('.prefs.json'):
-        assertTrue(False, 'no .prefs.json found. wrong current directory, or run step1_configure.py')
-    
+        assertTrue(
+            False, 'no .prefs.json found. wrong current directory, or run step1_configure.py'
+        )
+
     # read prefs file from disk
     with open('.prefs.json', encoding='utf-8') as f:
         s = f.read()
@@ -26,9 +28,16 @@ def getPrefs():
 
     return prefsBucket
 
-def run(listArgs, shell=False, createNoWindow=True,
-        throwOnFailure=RuntimeError, stripText=True,
-        captureOutput=True, silenceOutput=False):
+
+def run(
+    listArgs,
+    shell=False,
+    createNoWindow=True,
+    throwOnFailure=RuntimeError,
+    stripText=True,
+    captureOutput=True,
+    silenceOutput=False
+):
     kwargs = {}
 
     if sys.platform.startswith('win') and createNoWindow:
@@ -39,8 +48,9 @@ def run(listArgs, shell=False, createNoWindow=True,
     stderr = None
 
     if captureOutput:
-        sp = subprocess.Popen(listArgs, shell=shell,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
+        sp = subprocess.Popen(
+            listArgs, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs
+        )
 
         comm = sp.communicate()
         stdout = comm[0]
@@ -64,11 +74,10 @@ def run(listArgs, shell=False, createNoWindow=True,
 
     return retcode, stdout, stderr
 
+
 def helpInterpretPath(s):
     s = s.strip()
     if s.startswith('"') and s.endswith('"'):
         s = s[1:-1]
 
     return s
-
-
