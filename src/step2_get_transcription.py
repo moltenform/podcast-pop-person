@@ -92,7 +92,7 @@ def launchJob(prefs, audioUrl, speakerMin, speakerMax):
     print(args)
 
     print('Sending to azure:', endpoint)
-    retcode, stdout, stderr = utils.run(args)
+    _retcode, stdout, stderr = utils.run(args)
     jsonObj = json.loads(stdout.decode('utf-8'))
     if 'self' not in jsonObj:
         utils.assertTrue(False, 'self not present', stdout, stderr)
@@ -108,7 +108,7 @@ def _azureHttpGet(prefs, url):
     print('GET request from url: ', url)
     args = (rf'-v|-X|GET|{url}|-H|Ocp-Apim-Subscription-Key: {prefs.sub_key}').split('|')
     args.insert(0, prefs.curl_path)
-    retcode, stdout, stderr = utils.run(args)
+    _retcode, stdout, _stderr = utils.run(args)
     jsonObj = json.loads(stdout.decode('utf-8'))
     return jsonObj
 
